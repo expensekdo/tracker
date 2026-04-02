@@ -3,337 +3,106 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Business Tracker - Multi-User</title>
+    <title>Reverse Image Location Search</title>
     <style>
         body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            margin: 0; 
-            padding: 20px; 
-            background-color: #f4f7f6; 
-            color: #333;
+            font-family: Arial, sans-serif; 
+            background-color: #f4f4f9; 
+            padding: 40px; 
+            display: flex; 
+            justify-content: center; 
         }
         .container { 
-            max-width: 650px; 
-            margin: auto; 
             background: white; 
             padding: 30px; 
             border-radius: 10px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
-        }
-        h2, h3 { 
+            box-shadow: 0px 4px 10px rgba(0,0,0,0.1); 
             text-align: center; 
-            color: #2c3e50;
+            width: 100%; 
+            max-width: 400px; 
         }
-        
-        /* Dashboard Layout */
-        .summary-dashboard { 
-            display: grid; 
-            grid-template-columns: repeat(3, 1fr); 
-            gap: 15px;
-            margin-bottom: 30px; 
-        }
-        .summary-card { 
-            padding: 15px; 
-            background: #f8f9fa; 
-            border-radius: 8px; 
-            text-align: center; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-        .summary-card.full-width {
-            grid-column: span 3;
-            background: #e8f4f8;
-            border: 1px solid #d4e6f1;
-        }
-        .summary-card h4 {
-            margin: 0 0 10px 0;
-            font-size: 13px;
-            text-transform: uppercase;
-            color: #7f8c8d;
-        }
-        .summary-card p {
-            margin: 0;
-            font-size: 20px;
-            font-weight: bold;
-        }
-        .balance-text { color: #2980b9; }
-        .individual-text { color: #2c3e50; }
-        
-        /* Forms and Inputs */
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid #ecf0f1;
-        }
-        input, select, button { 
-            padding: 12px; 
-            border: 1px solid #bdc3c7;
-            border-radius: 5px;
-            font-size: 16px;
+        input[type="file"] { 
+            margin: 20px 0; 
         }
         button { 
-            background: #2c3e50; 
+            background-color: #007BFF; 
             color: white; 
             border: none; 
+            padding: 10px 20px; 
+            border-radius: 5px; 
             cursor: pointer; 
-            font-weight: bold;
-            transition: background 0.3s ease;
+            font-size: 16px;
         }
-        button:hover { background: #34495e; }
-
-        /* Filter Section */
-        .filter-section {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: #e8f4f8;
+        button:hover { 
+            background-color: #0056b3; 
+        }
+        #result { 
+            margin-top: 20px; 
+            text-align: left; 
             padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            border: 1px solid #d4e6f1;
-        }
-        .filter-section label { font-weight: bold; color: #2c3e50; }
-        .filter-section input { flex-grow: 1; margin: 0 15px; }
-        .clear-btn { background: #95a5a6; }
-        .clear-btn:hover { background: #7f8c8d; }
-        
-        /* Transaction List */
-        ul { list-style-type: none; padding: 0; margin: 0; }
-        li { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center;
-            padding: 15px; 
-            background: #fff; 
-            border: 1px solid #ecf0f1;
-            margin-bottom: 10px;
+            background: #eef;
             border-radius: 5px;
+            display: none;
         }
-        .income-item { border-left: 5px solid #27ae60; }
-        .expense-item { border-left: 5px solid #e74c3c; }
-        
-        .transaction-details { display: flex; flex-direction: column; }
-        .transaction-title { font-weight: bold; }
-        .transaction-meta { font-size: 12px; color: #95a5a6; margin-top: 4px; }
-        .person-badge { 
-            background: #3498db; 
-            color: white; 
-            padding: 2px 6px; 
-            border-radius: 4px; 
-            font-size: 11px;
-            margin-right: 8px;
-        }
-        .transaction-amount { font-weight: bold; }
-        
-        .delete-btn { 
-            background: #e74c3c; 
-            color: white; 
-            border: none; 
-            padding: 8px 12px; 
-            cursor: pointer; 
-            border-radius: 4px;
-            font-size: 12px;
-            margin-left: 15px;
-        }
-        .delete-btn:hover { background: #c0392b; }
+        a { color: #007BFF; text-decoration: none; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h2>Financial Tracker</h2>
-
-    <div class="summary-dashboard">
-        <div class="summary-card full-width">
-            <h4>Overall Business Balance</h4>
-            <p class="balance-text">₹<span id="balance">0.00</span></p>
-        </div>
-        <div class="summary-card">
-            <h4>Arshad Kota</h4>
-            <p class="individual-text">₹<span id="kota-balance">0.00</span></p>
-        </div>
-        <div class="summary-card">
-            <h4>Shahnwaz</h4>
-            <p class="individual-text">₹<span id="shahnwaz-balance">0.00</span></p>
-        </div>
-        <div class="summary-card">
-            <h4>Arshad Sangod</h4>
-            <p class="individual-text">₹<span id="sangod-balance">0.00</span></p>
-        </div>
-    </div>
-
-    <form id="transaction-form">
-        <select id="person" required>
-            <option value="" disabled selected>Select Person...</option>
-            <option value="Arshad Kota">Arshad Kota</option>
-            <option value="Shahnwaz">Shahnwaz</option>
-            <option value="Arshad Sangod">Arshad Sangod</option>
-        </select>
-        <input type="text" id="desc" placeholder="Description (e.g., Wholesale Kota Doria Order)" required>
-        <input type="number" id="amount" placeholder="Amount (₹)" step="0.01" required>
-        <select id="type">
-            <option value="income">Income (+ Add to Balance)</option>
-            <option value="expense">Expense (- Subtract from Balance)</option>
-        </select>
-        <button type="submit">Add Transaction</button>
-    </form>
-
-    <div class="filter-section">
-        <label for="month-filter">View Month:</label>
-        <input type="month" id="month-filter">
-        <button class="clear-btn" id="clear-filter">Show All</button>
-    </div>
-
-    <h3>Transaction History</h3>
-    <ul id="transaction-list"></ul>
-</div>
-
-<script>
-    // Load existing memory from Local Storage
-    let transactions = JSON.parse(localStorage.getItem('multiUserTrackerData')) || [];
-
-    // Quick background fix: Upgrade any old transactions to have unique IDs and proper month strings
-    transactions = transactions.map(t => {
-        if (!t.id) t.id = Math.random().toString(36).substr(2, 9);
-        if (!t.monthId) {
-            try {
-                let parts = t.date.split('/');
-                t.monthId = `${parts[2]}-${parts[1].padStart(2, '0')}`;
-            } catch(e) {
-                t.monthId = new Date().toISOString().slice(0, 7);
-            }
-        }
-        return t;
-    });
-
-    // DOM Elements
-    const balanceEl = document.getElementById('balance');
-    const kotaBalanceEl = document.getElementById('kota-balance');
-    const shahnwazBalanceEl = document.getElementById('shahnwaz-balance');
-    const sangodBalanceEl = document.getElementById('sangod-balance');
-    const listEl = document.getElementById('transaction-list');
-    const form = document.getElementById('transaction-form');
-    const personInput = document.getElementById('person');
-    const descInput = document.getElementById('desc');
-    const amountInput = document.getElementById('amount');
-    const typeInput = document.getElementById('type');
-    const monthFilterInput = document.getElementById('month-filter');
-    const clearFilterBtn = document.getElementById('clear-filter');
-
-    // Function to calculate and render the screen based on the filter
-    function updateDOM() {
-        listEl.innerHTML = '';
+    <div class="container">
+        <h2>Location Search</h2>
+        <p>Upload an image to find its exact coordinates.</p>
         
-        let totalBalance = 0;
-        let balances = {
-            "Arshad Kota": 0,
-            "Shahnwaz": 0,
-            "Arshad Sangod": 0
-        };
+        <input type="file" id="imageInput" accept="image/*">
+        <br>
+        <button onclick="uploadImage()">Search Location</button>
+        
+        <div id="result">
+            </div>
+    </div>
 
-        const selectedMonth = monthFilterInput.value;
-
-        // Filter transactions based on the selected month (if any)
-        const filteredTransactions = transactions.filter(t => {
-            if (!selectedMonth) return true; // Show all if no filter is set
-            return t.monthId === selectedMonth;
-        });
-
-        // Render list and calculate totals ONLY for the filtered items
-        filteredTransactions.forEach(t => {
-            // Math for balances
-            if (t.type === 'income') {
-                totalBalance += t.amount;
-                if (balances[t.person] !== undefined) balances[t.person] += t.amount;
-            } else {
-                totalBalance -= t.amount;
-                if (balances[t.person] !== undefined) balances[t.person] -= t.amount;
-            }
-
-            // Create HTML for the item
-            const li = document.createElement('li');
-            li.classList.add(t.type === 'income' ? 'income-item' : 'expense-item');
+    <script>
+        async function uploadImage() {
+            const fileInput = document.getElementById('imageInput');
+            const resultDiv = document.getElementById('result');
             
-            li.innerHTML = `
-                <div class="transaction-details">
-                    <span class="transaction-title">${t.desc}</span>
-                    <div class="transaction-meta">
-                        <span class="person-badge">${t.person}</span>
-                        <span>${t.date}</span>
-                    </div>
-                </div>
-                <div style="display: flex; align-items: center;">
-                    <span class="transaction-amount" style="color: ${t.type === 'income' ? '#27ae60' : '#e74c3c'}">
-                        ${t.type === 'income' ? '+' : '-'} ₹${t.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
-                    </span>
-                    <button class="delete-btn" onclick="deleteTransaction('${t.id}')">Delete</button>
-                </div>
-            `;
-            listEl.appendChild(li);
-        });
+            if (!fileInput.files[0]) {
+                alert("Please select an image first.");
+                return;
+            }
 
-        // Update Top Dashboard Numbers
-        balanceEl.innerText = totalBalance.toLocaleString('en-IN', { minimumFractionDigits: 2 });
-        kotaBalanceEl.innerText = balances["Arshad Kota"].toLocaleString('en-IN', { minimumFractionDigits: 2 });
-        shahnwazBalanceEl.innerText = balances["Shahnwaz"].toLocaleString('en-IN', { minimumFractionDigits: 2 });
-        sangodBalanceEl.innerText = balances["Arshad Sangod"].toLocaleString('en-IN', { minimumFractionDigits: 2 });
+            resultDiv.style.display = "block";
+            resultDiv.innerHTML = "<p>Analyzing image... Please wait.</p>";
 
-        // Save pure transaction list to Local Storage (no filters applied)
-        localStorage.setItem('multiUserTrackerData', JSON.stringify(transactions));
-    }
+            const formData = new FormData();
+            formData.append('image', fileInput.files[0]);
 
-    // 2-Step Delete a transaction (Using Browser Confirmation)
-    window.deleteTransaction = function(id) {
-        // Step 1 & 2: The popup forces the user to confirm their action
-        const isConfirmed = confirm("Are you sure you want to permanently delete this transaction?");
-        
-        if (isConfirmed) {
-            // Find the exact transaction by ID and remove it
-            transactions = transactions.filter(t => t.id !== id);
-            updateDOM();
+            try {
+                // IMPORTANT: This connects the HTML to your Python backend!
+                // We are assuming your Python server will run locally on port 5000.
+                const response = await fetch('http://localhost:5000/search', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+                
+                if (data.error) {
+                    resultDiv.innerHTML = `<p style='color:red;'>Error: ${data.error}</p>`;
+                } else {
+                    resultDiv.innerHTML = `
+                        <h3 style="margin-top: 0;">Location Found!</h3>
+                        <p><strong>Name:</strong> ${data.name}</p>
+                        <p><strong>Accuracy:</strong> ${data.confidence}%</p>
+                        <hr>
+                        <p><a href="http://maps.google.com/maps?q=${data.lat},${data.lng}" target="_blank">📍 View on Google Maps</a></p>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = "<p style='color:red;'>Error: Could not connect to the server. Make sure your Python backend is running.</p>";
+            }
         }
-    };
-
-    // Add new transaction
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const person = personInput.value;
-        const desc = descInput.value;
-        const amount = parseFloat(amountInput.value);
-        const type = typeInput.value;
-        
-        const now = new Date();
-        const date = now.toLocaleDateString('en-IN');
-        // Create an ID specifically for the month filter (Format: YYYY-MM)
-        const monthId = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
-        // Create a unique ID for deletion tracking
-        const id = Math.random().toString(36).substr(2, 9);
-
-        if (!person || desc.trim() === '' || isNaN(amount)) return;
-
-        transactions.push({ id, person, desc, amount, type, date, monthId });
-        updateDOM();
-
-        // Clear inputs (keep the person selected for faster data entry)
-        descInput.value = '';
-        amountInput.value = '';
-    });
-
-    // Handle Filter Changes
-    monthFilterInput.addEventListener('change', updateDOM);
-    
-    // Handle Clear Filter Button
-    clearFilterBtn.addEventListener('click', function() {
-        monthFilterInput.value = '';
-        updateDOM();
-    });
-
-    // Initial render when the page first loads
-    updateDOM();
-</script>
+    </script>
 
 </body>
 </html>
